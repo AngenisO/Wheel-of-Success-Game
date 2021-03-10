@@ -2,6 +2,7 @@ const btn_reset = document.querySelector('.btn__reset');
 const overlay = document.getElementById('overlay');
 const qwerty = document.getElementById('qwerty');
 const phrase = document.getElementById('phrase');
+const heartLive = document.querySelectorAll('.tries')[0];
 let missed = 0; 
 
 const phrases = [
@@ -15,7 +16,7 @@ const phrases = [
 btn_reset.addEventListener('click', () => {
     if(btn_reset.textContent == 'Start Game'){
         overlay.style.display = 'none';
-    }if (btn_reset.textContent == 'Replay'){
+    }else if (btn_reset.textContent == 'Replay'){
         overlay.style.display = "none";
     }
 
@@ -43,13 +44,51 @@ const addPhraseToDisplay  = (arr) => {
 const phraseArray = getRandomPhraseAsArray(phrases);
 addPhraseToDisplay(phraseArray);
 
-const checkLetter = (qwerty) => {
+const checkLetter = (clickBtn) => {
     let letter = document.querySelectorAll('.letter');
     let match = null;
     for(let i = 0; i < letter.length; i++){
-        if(qwerty === letter[i].textContent.toLowerCase()){
+        if(clickBtn === letter[i].textContent.toLowerCase()){
             letter[i].classList.add("show");
-            match = qwerty;
+            match = clickBtn;
         }
     } return match;
-}
+};
+
+
+const missGuess = () => {
+    const heartImg = heartLive.firstElementChild;
+    heartImg.src = "images/lostHeart.png";
+    heartImg.className = "lost";
+    missed+= 1 ;
+};
+
+qwerty.addEventListener('click', (e) => {
+    if(e.target.tagName === 'BUTTON'){
+        e.target.classList.add('chosen');
+        e.target.setAttribute('disabled', true);
+        let checked = checkLetter(e.target.textContent);
+        console.log(checked);
+    }else if (checked === null){
+        missed += 1;
+        heartLive[missed-1].setAttribute("src", "images/lostHeart.png");
+    }
+
+});
+
+function endGame (result, msg)  {
+    overlay.className = result;
+    overlay.firstElementChild.textContent = message;
+    overlay.lastElementChild.textContent = "New Game";
+    overlay.style.display = "block";
+};
+
+function checkWin(){
+    const letters = document.querySelectorAll(".letter");
+    const show = document.querySelectorAll('.show');
+    if(letters.length === show.length){
+        endGame("win","You Win!");
+    } else if (missed => 5){
+        endGame('lose','Sorry, You Lose!')
+    }
+};
